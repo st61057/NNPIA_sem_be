@@ -9,6 +9,7 @@ import org.example.enums.RESERVATION_STATUS;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -32,6 +33,11 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "procedure_id")
     private Procedure procedure;
+
+    @NotNull
+    @Column
+    private Date reservationDate;
+
     @NotNull
     @Column
     private LocalDateTime start;
