@@ -1,7 +1,10 @@
 package org.example.service;
 
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.example.dto.ProcedureCreationDto;
+import org.example.dto.ProcedureDto;
 import org.example.entity.Procedure;
 import org.example.entity.Reservation;
 import org.example.enums.RESERVATION_STATUS;
@@ -36,13 +39,21 @@ public class ProcedureService {
     public Procedure findByName(String name) {
         return procedureRepository.findByName(name);
     }
+    public boolean doesProcedureExists(Integer id) {
+        Optional<Procedure> procedure = procedureRepository.findById(id);
+        return procedure.isPresent();
+    }
 
-    public Procedure createNewProcedure(Procedure newProcedure) {
-        Procedure procedure = procedureRepository.findByName(newProcedure.getName());
-        if (procedure != null) {
+    public boolean doesProcedureExists(String name) {
+        return findByName(name) != null;
+    }
+
+    public Procedure createNewProcedure(ProcedureDto newProcedure) {
+        if (procedureRepository.findByName(newProcedure.getName()) != null) {
             throw new RuntimeException("Procedure already exists!");
         }
-        return procedureRepository.save(newProcedure);
+        Procedure procedure = new Procedure(newProcedure.getName(), newProcedure.getDescription(), newProcedure.getPrice());
+        return procedureRepository.save(procedure);
     }
 
     public Procedure updateProcedure(Procedure procedure) {

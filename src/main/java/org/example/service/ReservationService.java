@@ -7,7 +7,6 @@ import org.example.enums.RESERVATION_STATUS;
 import org.example.repository.ReservationRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @AllArgsConstructor
