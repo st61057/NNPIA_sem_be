@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @NoArgsConstructor
 public class ProcedureController {
 
-    public ProcedureService procedureService;
+    private ProcedureService procedureService;
 
-    public DtoConverter converter;
+    private DtoConverter converter;
 
     @PostMapping("/api/procedure")
     public ResponseEntity<?> addProcedure(@RequestBody ProcedureDto procedureDto) {

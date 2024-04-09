@@ -3,8 +3,9 @@ package org.example.service;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.example.entity.Reservation;
-import org.example.enums.RESERVATION_STATUS;
+import org.example.enums.ReservationStatus;
 import org.example.repository.ReservationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -13,7 +14,8 @@ import org.springframework.stereotype.Service;
 @NoArgsConstructor
 public class ReservationService {
 
-    public ReservationRepository reservationRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     public Reservation createReservation(Reservation reservation) {
         Reservation existingReservation = reservationRepository.findReservationByStartBetweenAndEnd(reservation.getReservationDate(), reservation.getStart(), reservation.getEnd());
@@ -26,12 +28,12 @@ public class ReservationService {
 
     public Reservation confirmReservation(Integer id) {
         Reservation reservation = reservationRepository.findReservationById(id);
-        reservation.setStatus(RESERVATION_STATUS.CONFIRMED);
+        reservation.setStatus(ReservationStatus.CONFIRMED);
         return reservationRepository.save(reservation);
     }
     public Reservation cancelReservation(Integer id) {
         Reservation reservation = reservationRepository.findReservationById(id);
-        reservation.setStatus(RESERVATION_STATUS.CANCELED);
+        reservation.setStatus(ReservationStatus.CANCELED);
         return reservationRepository.save(reservation);
     }
 }

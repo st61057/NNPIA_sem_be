@@ -8,6 +8,7 @@ public class LoginChangePasswordDto {
     private String username;
 
     private String oldPassword;
+
     private String newPassword;
 
 }

@@ -1,6 +1,6 @@
 package org.example.enums;
 
-public enum RESERVATION_STATUS {
+public enum ReservationStatus {
     CREATED,
     CONFIRMED,
     DONE,

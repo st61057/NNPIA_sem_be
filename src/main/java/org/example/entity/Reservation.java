@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.enums.RESERVATION_STATUS;
+import org.example.enums.ReservationStatus;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -28,7 +28,7 @@ public class Reservation {
 
     @NotNull
     @Column
-    private RESERVATION_STATUS status;
+    private ReservationStatus status;
 
     @ManyToOne
     @JoinColumn(name = "procedure_id")

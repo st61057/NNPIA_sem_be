@@ -1,14 +1,12 @@
 package org.example.service;
 
-import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.example.dto.ProcedureCreationDto;
 import org.example.dto.ProcedureDto;
 import org.example.entity.Procedure;
 import org.example.entity.Reservation;
-import org.example.enums.RESERVATION_STATUS;
-import org.example.enums.RESERVATION_VALIDITY;
+import org.example.enums.ReservationStatus;
+import org.example.enums.ReservationValidity;
 import org.example.repository.ProcedureRepository;
 import org.example.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +21,17 @@ import java.util.Optional;
 public class ProcedureService {
 
     @Autowired
-    public ProcedureRepository procedureRepository;
+    private ProcedureRepository procedureRepository;
 
     @Autowired
-    public ReservationRepository reservationRepository;
+    private ReservationRepository reservationRepository;
 
     public List<Procedure> findAll() {
         return procedureRepository.findAll();
     }
 
     public List<Procedure> findAllActive() {
-        return procedureRepository.findAllByValidity(RESERVATION_VALIDITY.VALID);
+        return procedureRepository.findAllByValidity(ReservationValidity.VALID);
     }
 
     public Procedure findByName(String name) {
@@ -75,7 +73,7 @@ public class ProcedureService {
             List<Reservation> reservationList = reservationRepository.findReservationsByProcedureId(procedure.get().getId());
             if (!reservationList.isEmpty()) {
                 for (Reservation reservation : reservationList) {
-                    reservation.setStatus(RESERVATION_STATUS.CANCELED);
+                    reservation.setStatus(ReservationStatus.CANCELED);
                     reservationRepository.save(reservation);
                 }
             }

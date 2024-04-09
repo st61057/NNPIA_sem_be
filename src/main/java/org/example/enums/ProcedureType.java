@@ -1,6 +1,6 @@
 package org.example.enums;
 
-public enum PROCEDURE_TYPE {
+public enum ProcedureType {
     HAIR,
     BEARD,
     KIDS,

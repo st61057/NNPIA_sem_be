@@ -1,6 +1,6 @@
 package org.example.enums;
 
-public enum RESERVATION_VALIDITY {
+public enum ReservationValidity {
     VALID, //neproběhla
     INVALID //proběhla
 }

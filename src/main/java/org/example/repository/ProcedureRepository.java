@@ -1,7 +1,7 @@
 package org.example.repository;
 
 import org.example.entity.Procedure;
-import org.example.enums.RESERVATION_VALIDITY;
+import org.example.enums.ReservationValidity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public interface ProcedureRepository extends JpaRepository<Procedure, Integer> {
 
     List<Procedure> findAll();
 
-    List<Procedure> findAllByValidity(RESERVATION_VALIDITY validity);
+    List<Procedure> findAllByValidity(ReservationValidity validity);
 
 
 }
