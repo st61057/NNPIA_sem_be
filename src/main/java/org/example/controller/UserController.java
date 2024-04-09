@@ -3,9 +3,8 @@ package org.example.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.example.dto.LoginChangePasswordDto;
-import org.example.entity.Login;
-import org.example.service.LoginService;
+import org.example.dto.ChangeUserLoginPasswordDto;
+import org.example.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,13 +12,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginController {
+public class UserController {
 
-    private LoginService loginService;
+    private UserService userService;
 
     @PutMapping
-    public ResponseEntity<Boolean> changePassword(@RequestBody LoginChangePasswordDto loginChangePasswordDto) {
-        if (loginService.changePassword(loginChangePasswordDto)) {
+    public ResponseEntity<Boolean> changePassword(@RequestBody ChangeUserLoginPasswordDto changeUserLoginPasswordDto) {
+        if (userService.changePassword(changeUserLoginPasswordDto)) {
             return ResponseEntity.ok(true);
         }
         return ResponseEntity.badRequest().body(false);

@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Login {
+public class User {
 
     @Id
     @Column
