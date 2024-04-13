@@ -18,7 +18,7 @@ public class ReservationService {
     private ReservationRepository reservationRepository;
 
     public Reservation createReservation(Reservation reservation) {
-        Reservation existingReservation = reservationRepository.findReservationByStartBetweenAndEnd(reservation.getReservationDate(), reservation.getStart(), reservation.getEnd());
+        Reservation existingReservation = reservationRepository.findReservationByStartTimeBetweenAndEndTime(reservation.getReservationDate(), reservation.getStartTime(), reservation.getEndTime());
         if (existingReservation == null) {
             reservationRepository.save(reservation);
             return reservation;
@@ -31,9 +31,16 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.CONFIRMED);
         return reservationRepository.save(reservation);
     }
+
     public Reservation cancelReservation(Integer id) {
         Reservation reservation = reservationRepository.findReservationById(id);
         reservation.setStatus(ReservationStatus.CANCELED);
+        return reservationRepository.save(reservation);
+    }
+
+    public Reservation setAsDone(Integer id) {
+        Reservation reservation = reservationRepository.findReservationById(id);
+        reservation.setStatus(ReservationStatus.DONE);
         return reservationRepository.save(reservation);
     }
 }

@@ -1,10 +1,10 @@
 package org.example.repository;
 
-import org.example.entity.User;
+import org.example.entity.UserLogin;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface LoginRepository extends JpaRepository<User, Integer> {
+public interface LoginRepository extends JpaRepository<UserLogin, Integer> {
 
-    User findByUserName(String username);
+    UserLogin findByUsername(String username);
 
 }

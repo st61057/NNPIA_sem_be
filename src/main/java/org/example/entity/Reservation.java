@@ -9,10 +9,12 @@ import org.example.enums.ReservationStatus;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Getter
 @Setter
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 public class Reservation {
@@ -40,10 +42,10 @@ public class Reservation {
 
     @NotNull
     @Column
-    private LocalDateTime start;
+    private LocalTime startTime;
 
     @NotNull
     @Column
-    private LocalDateTime end;
+    private LocalTime endTime;
 
 }

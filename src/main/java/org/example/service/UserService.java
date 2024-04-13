@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.dto.ChangeUserLoginPasswordDto;
-import org.example.entity.User;
+import org.example.entity.UserLogin;
 import org.example.repository.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,29 +14,29 @@ public class UserService {
     @Autowired
     private LoginRepository loginRepository;
 
-    public User findLoginByUserName(String username) {
+    public UserLogin findLoginByUserName(String username) {
         if (username == null || username.isEmpty()) {
             throw new RuntimeException("Empty user name input");
         }
-        User user = loginRepository.findByUserName(username);
-        if (user == null) {
+        UserLogin userLogin = loginRepository.findByUsername(username);
+        if (userLogin == null) {
             throw new NoSuchElementException("User doesn't exist");
         }
-        return user;
+        return userLogin;
     }
 
     public boolean changePassword(ChangeUserLoginPasswordDto changeUserLoginPasswordDto) {
-        User user = loginRepository.findByUserName(changeUserLoginPasswordDto.getUsername());
+        UserLogin userLogin = loginRepository.findByUsername(changeUserLoginPasswordDto.getUsername());
 
-        if (user == null) {
+        if (userLogin == null) {
             throw new RuntimeException("Login doesn't exist!");
         }
 
-        if (user.getPassword() != changeUserLoginPasswordDto.getOldPassword()) {
+        if (userLogin.getPassword() != changeUserLoginPasswordDto.getOldPassword()) {
             throw new RuntimeException("Old password doesn't match");
         }
 
-        user.setPassword(changeUserLoginPasswordDto.getNewPassword());
+        userLogin.setPassword(changeUserLoginPasswordDto.getNewPassword());
         return true;
 
     }

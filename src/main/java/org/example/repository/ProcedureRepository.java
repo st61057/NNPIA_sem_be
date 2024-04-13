@@ -12,7 +12,7 @@ public interface ProcedureRepository extends JpaRepository<Procedure, Integer> {
 
     List<Procedure> findAll();
 
-    List<Procedure> findAllByValidity(ReservationValidity validity);
+    List<Procedure> findAllByStatus(ReservationValidity validity);
 
 
 }

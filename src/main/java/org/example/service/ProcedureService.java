@@ -31,7 +31,7 @@ public class ProcedureService {
     }
 
     public List<Procedure> findAllActive() {
-        return procedureRepository.findAllByValidity(ReservationValidity.VALID);
+        return procedureRepository.findAllByStatus(ReservationValidity.VALID);
     }
 
     public Procedure findByName(String name) {
