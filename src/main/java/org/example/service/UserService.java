@@ -4,8 +4,13 @@ import org.example.dto.ChangeUserLoginPasswordDto;
 import org.example.entity.UserLogin;
 import org.example.repository.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -39,6 +44,18 @@ public class UserService {
         userLogin.setPassword(changeUserLoginPasswordDto.getNewPassword());
         return true;
 
+    }
+
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserLogin login = loginRepository.findByUsername(username);
+        if (login == null) {
+            throw new UsernameNotFoundException("Invalid username or password.");
+        }
+        return new org.springframework.security.core.userdetails.User(login.getUsername(), login.getPassword(), getAuthority());
+    }
+
+    private List<SimpleGrantedAuthority> getAuthority() {
+        return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
 

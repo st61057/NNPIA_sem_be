@@ -2,11 +2,9 @@ package org.example.Utils;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.example.dto.ProcedureCreationDto;
 import org.example.dto.ProcedureDto;
 import org.example.entity.Procedure;
 import org.modelmapper.ModelMapper;
-import org.springframework.context.annotation.Bean;
 
 @AllArgsConstructor
 @NoArgsConstructor
