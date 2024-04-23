@@ -3,10 +3,7 @@ package org.example.controller;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.example.Utils.DtoConverter;
-import org.example.dto.ProcedureDto;
-import org.example.dto.ReservationResponseDto;
-import org.example.dto.CreatingReservationDto;
-import org.example.dto.TimeSlotDto;
+import org.example.dto.*;
 import org.example.entity.Procedure;
 import org.example.entity.Reservation;
 import org.example.entity.UserLogin;
@@ -15,6 +12,8 @@ import org.example.service.BarbershopService;
 import org.example.service.ProcedureService;
 import org.example.service.ReservationService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -83,17 +82,26 @@ public class ReservationController {
 
     }
 
-//    @GetMapping("/api/reservation")
-//    public ResponseEntity<?> getAllByDateAndStatus(Long salonId, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date, RESERVATION_STATUS status, Pageable pageable) {
-//        Page<Reservation> pagedResult;
-//        if (status != ReservationStatus.CREATED && status != ReservationStatus.CONFIRMED && status != ReservationStatus.DONE) {
-//            pagedResult = reservationService. getReservationByDate(pageable, salonId, date);
-//        } else {
-//            pagedResult = reservationService.getReservationByDateAndStatus(pageable, salonId, date, status);
-//        }
-//        ReservationPagingDto reservationPagingDto = convertToPagingDto(pagedResult);
-//        return new ApiResponse<>(HttpStatus.OK.value(), "OK", reservationPagingDto);
-//    }
+    @GetMapping("/api/reservation")
+    public ResponseEntity<?> getAllByEmailAndDateAndStatus(String email, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date, ReservationStatus status, Pageable pageable) {
+        Page<Reservation> pagedResult = reservationService.findAllByEmailAndReservationDateAndStatus(email, date, status, pageable);
+        ReservationPagingDto reservationPagingDto = convertToPagingDto(pagedResult);
+        return ResponseEntity.ok(reservationPagingDto);
+    }
+
+    @GetMapping("/api/reservation")
+    public ResponseEntity<?> getAllByDateAndStatus(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, ReservationStatus status, Pageable pageable) {
+        Page<Reservation> pagedResult = reservationService.findAllByStatusAAndReservationDate(date, status, pageable);
+        ReservationPagingDto reservationPagingDto = convertToPagingDto(pagedResult);
+        return ResponseEntity.ok(reservationPagingDto);
+    }
+
+    @GetMapping("/api/reservation")
+    public ResponseEntity<?> getAllByStatus(ReservationStatus status, Pageable pageable) {
+        Page<Reservation> pagedResult = reservationService.findAllByStatus(status, pageable);
+        ReservationPagingDto reservationPagingDto = convertToPagingDto(pagedResult);
+        return ResponseEntity.ok(reservationPagingDto);
+    }
 
 
     private Reservation convertToEntity(CreatingReservationDto createReservationDtoIn) {
@@ -116,16 +124,16 @@ public class ReservationController {
         return reservationDtoOut;
     }
 
-//    private ReservationPagingDto convertToPagingDto(Page<Reservation> pagedResult) {
-//        if (pagedResult.hasContent()) {
-//            ReservationPagingDto reservationPagingDto = new ReservationPagingDto();
-//            reservationPagingDto.setReservationList(pagedResult.getContent());
-//            reservationPagingDto.setNumberOfElements(pagedResult.getTotalElements());
-//            return reservationPagingDto;
-//        } else {
-//            return new ReservationPagingDto();
-//        }
-//    }
+    private ReservationPagingDto convertToPagingDto(Page<Reservation> pagedResult) {
+        if (pagedResult.hasContent()) {
+            ReservationPagingDto reservationPagingDto = new ReservationPagingDto();
+            reservationPagingDto.setReservationsList(pagedResult.getContent());
+            reservationPagingDto.setNumberOfReservations(pagedResult.getNumberOfElements());
+            return reservationPagingDto;
+        } else {
+            return new ReservationPagingDto();
+        }
+    }
 
     public ProcedureDto convertProcedureToDto(Procedure procedure) {
         ProcedureDto procedureDto = modelMapper.map(procedure, ProcedureDto.class);

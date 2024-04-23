@@ -4,9 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.example.entity.Reservation;
 import org.example.enums.ReservationStatus;
+import org.example.repository.ReservationPagingRepository;
 import org.example.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 
 @Service
@@ -16,6 +21,8 @@ public class ReservationService {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    private ReservationPagingRepository reservationPagingRepository;
 
     public Reservation createReservation(Reservation reservation) {
         Reservation existingReservation = reservationRepository.findReservationByStartTimeBetweenAndEndTime(reservation.getReservationDate(), reservation.getStartTime(), reservation.getEndTime());
@@ -42,5 +49,17 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findReservationById(id);
         reservation.setStatus(ReservationStatus.DONE);
         return reservationRepository.save(reservation);
+    }
+
+    public Page<Reservation> findAllByEmailAndReservationDateAndStatus(String email, Date reservationDate, ReservationStatus status, Pageable pageVariable) {
+        return reservationPagingRepository.findAllByEmailAndReservationDateAndStatus(email, reservationDate, status, pageVariable);
+    }
+
+    public Page<Reservation> findAllByStatus(ReservationStatus status, Pageable pageVariable) {
+        return reservationPagingRepository.findAllByStatus(status, pageVariable);
+    }
+
+    public Page<Reservation> findAllByStatusAAndReservationDate(Date reservationDate, ReservationStatus status, Pageable pageVariable) {
+        return reservationPagingRepository.findAllByStatusAAndReservationDate(reservationDate, status, pageVariable);
     }
 }
