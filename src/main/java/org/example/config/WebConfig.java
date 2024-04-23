@@ -16,4 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .maxAge(3600);
     }
+    // CORS (Cross-Origin Resource Sharing) umožňuje webům omezit zdroje, které jsou sdíleny s jinými doménami.
+    // Nastavením CORS na serveru můžeme specifikovat, které domény mají přístup k našim zdrojům.
+    // Toto nastavení pomáhá chránit proti běžným webovým útokům, jako je Cross-Site Scripting (XSS) a Data theft.
+
 }
