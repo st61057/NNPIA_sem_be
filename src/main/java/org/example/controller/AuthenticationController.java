@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.config.JwtUtil;
+import org.example.dto.AuthenticationResponse;
 import org.example.dto.UserLoginDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,6 @@ public class AuthenticationController {
         }
 
         final String jwt = jwtUtil.createToken(userLoginDto);
-        return null;
-//        return ResponseEntity.ok(/*new AuthenticationResponse(jwt)*/);
+        return ResponseEntity.ok(new AuthenticationResponse(jwt));
     }
 }

@@ -9,6 +9,7 @@ import org.example.dto.CreatingReservationDto;
 import org.example.dto.TimeSlotDto;
 import org.example.entity.Procedure;
 import org.example.entity.Reservation;
+import org.example.entity.UserLogin;
 import org.example.enums.ReservationStatus;
 import org.example.service.BarbershopService;
 import org.example.service.ProcedureService;
@@ -16,6 +17,7 @@ import org.example.service.ReservationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,12 +37,12 @@ public class ReservationController {
     private ModelMapper modelMapper;
 
     @GetMapping("/public/reservation")
-    public List<TimeSlotDto> getAll(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, Long id) {
+    public List<TimeSlotDto> getAll(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, Long id, @AuthenticationPrincipal UserLogin userLogin) {
         return beautySalonService.getTimeSlotsForDate(date, id);
     }
 
     @PostMapping("/public/reservation")
-    public ResponseEntity<?> createReservation(@RequestBody @Valid CreatingReservationDto createReservationDtoIn) {
+    public ResponseEntity<?> createReservation(@RequestBody @Valid CreatingReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             Reservation reservation = convertToEntity(createReservationDtoIn);
             ReservationResponseDto reservationCreated = convertToReservationDto(reservationService.createReservation(reservation));
@@ -51,7 +53,7 @@ public class ReservationController {
     }
 
     @PutMapping("/api/reservation/confirm")
-    public ResponseEntity<?> confirmReservation(@RequestBody Integer resId) {
+    public ResponseEntity<?> confirmReservation(@RequestBody Integer resId, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.confirmReservation(resId));
             return ResponseEntity.status(200).body(reservation);
@@ -61,7 +63,7 @@ public class ReservationController {
     }
 
     @PutMapping("/api/reservation/asDone")
-    public ResponseEntity<?> setAsDone(@RequestBody Integer resId) {
+    public ResponseEntity<?> setAsDone(@RequestBody Integer resId, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.setAsDone(resId));
             return ResponseEntity.status(200).body(reservation);
@@ -71,7 +73,7 @@ public class ReservationController {
     }
 
     @PutMapping("/api/reservation/cancel")
-    public ResponseEntity<?> cancelReservation(@RequestBody Integer cancelDtoIn) {
+    public ResponseEntity<?> cancelReservation(@RequestBody Integer cancelDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.cancelReservation(cancelDtoIn));
             return ResponseEntity.status(200).body(reservation);
