@@ -2,7 +2,6 @@ package org.example.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.example.Utils.DtoConverter;
 import org.example.dto.*;
 import org.example.entity.Procedure;
 import org.example.entity.Reservation;
@@ -23,6 +22,7 @@ import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping()
 @AllArgsConstructor
@@ -30,7 +30,9 @@ import java.util.List;
 public class ReservationController {
 
     private BarbershopService beautySalonService;
+
     private ProcedureService procedureService;
+
     private ReservationService reservationService;
 
     private ModelMapper modelMapper;
@@ -41,7 +43,7 @@ public class ReservationController {
     }
 
     @PostMapping("/public/reservation")
-    public ResponseEntity<?> createReservation(@RequestBody @Valid CreatingReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> createReservation(@RequestBody @Valid CreateReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             Reservation reservation = convertToEntity(createReservationDtoIn);
             ReservationResponseDto reservationCreated = convertToReservationDto(reservationService.createReservation(reservation));
@@ -104,7 +106,7 @@ public class ReservationController {
     }
 
 
-    private Reservation convertToEntity(CreatingReservationDto createReservationDtoIn) {
+    private Reservation convertToEntity(CreateReservationDto createReservationDtoIn) {
         Reservation reservation = new Reservation();
         reservation.setEmail(createReservationDtoIn.getEmail());
         reservation.setReservationDate(createReservationDtoIn.getReservationDate());

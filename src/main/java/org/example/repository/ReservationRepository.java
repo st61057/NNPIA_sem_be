@@ -16,8 +16,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
     List<Reservation> findReservationsByProcedureId(Integer procedureId);
 
-    List<Reservation> findReservationsByReservationDate(Date date);
-
     List<Reservation> findReservationsByReservationDateAndStatus(Date date, ReservationStatus status);
 
     Reservation findReservationByStartTimeBetweenAndEndTime(Date date, LocalTime startTime, LocalTime endTime);

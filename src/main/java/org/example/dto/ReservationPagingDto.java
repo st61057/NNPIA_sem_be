@@ -9,6 +9,8 @@ import java.util.List;
 @Getter
 @Setter
 public class ReservationPagingDto {
-    List<Reservation> reservationsList = new ArrayList<>();
-    Integer numberOfReservations;
+
+    private List<Reservation> reservationsList = new ArrayList<>();
+
+    private Integer numberOfReservations = 0;
 }

@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 
 @Service
@@ -34,19 +36,19 @@ public class ReservationService {
     }
 
     public Reservation confirmReservation(Integer id) {
-        Reservation reservation = reservationRepository.findReservationById(id);
+        Reservation reservation = findById(id);
         reservation.setStatus(ReservationStatus.CONFIRMED);
         return reservationRepository.save(reservation);
     }
 
     public Reservation cancelReservation(Integer id) {
-        Reservation reservation = reservationRepository.findReservationById(id);
+        Reservation reservation = findById(id);
         reservation.setStatus(ReservationStatus.CANCELED);
         return reservationRepository.save(reservation);
     }
 
     public Reservation setAsDone(Integer id) {
-        Reservation reservation = reservationRepository.findReservationById(id);
+        Reservation reservation = findById(id);
         reservation.setStatus(ReservationStatus.DONE);
         return reservationRepository.save(reservation);
     }
@@ -61,5 +63,14 @@ public class ReservationService {
 
     public Page<Reservation> findAllByStatusAAndReservationDate(Date reservationDate, ReservationStatus status, Pageable pageVariable) {
         return reservationPagingRepository.findAllByStatusAAndReservationDate(reservationDate, status, pageVariable);
+    }
+
+    private Reservation findById(Integer id){
+        Optional<Reservation> reservation = reservationRepository.findById(id);
+        if (reservation.isPresent()) {
+            return reservation.get();
+        } else {
+            throw new NoSuchElementException("Reservation with id " + id + " was not found!");
+        }
     }
 }

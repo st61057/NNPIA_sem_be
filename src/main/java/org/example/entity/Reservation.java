@@ -20,7 +20,7 @@ import java.util.Date;
 public class Reservation {
 
     @Id
-    @Column
+    @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 

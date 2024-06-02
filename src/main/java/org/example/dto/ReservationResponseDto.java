@@ -8,7 +8,10 @@ import java.util.Date;
 public class ReservationResponseDto {
 
     private String email;
+
     private TimeSlotDto timeSlotDto;
+
     private Date date;
+
     private ProcedureDto procedureDto;
 }
