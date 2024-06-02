@@ -1,6 +1,7 @@
 package org.example.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.example.dto.TimeSlotDto;
 import org.example.entity.Barbershop;
 import org.example.entity.Reservation;
@@ -19,9 +20,12 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@NoArgsConstructor
 public class BarbershopService {
-    protected BarbershopRepository beautySalonRepository;
-    protected ReservationRepository reservationRepository;
+
+    private BarbershopRepository beautySalonRepository;
+
+    private ReservationRepository reservationRepository;
 
     public Barbershop findById(Long id) {
         return beautySalonRepository.findBarbershopById(id);
