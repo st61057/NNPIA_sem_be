@@ -19,7 +19,7 @@ public class UserService {
     @Autowired
     private LoginRepository loginRepository;
 
-    public UserLogin findLoginByUserName(String username) {
+    public UserLogin findLoginByUsername(String username) {
         if (username == null || username.isEmpty()) {
             throw new RuntimeException("Empty user name input");
         }
@@ -28,6 +28,18 @@ public class UserService {
             throw new NoSuchElementException("User doesn't exist");
         }
         return userLogin;
+    }
+
+    public void addUser(String username, String email, String password) {
+        UserLogin existingUserLogin = findLoginByUsername(username);
+
+        if (existingUserLogin == null) {
+            UserLogin userLogin = new UserLogin();
+            userLogin.setUsername(username);
+            userLogin.setEmail(email);
+            userLogin.setPassword(password);
+        }
+
     }
 
     public boolean changePassword(ChangeUserLoginPasswordDto changeUserLoginPasswordDto) {

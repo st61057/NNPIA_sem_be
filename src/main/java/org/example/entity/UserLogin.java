@@ -20,7 +20,7 @@ import java.util.Collection;
 public class UserLogin implements UserDetails {
 
     @Id
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 

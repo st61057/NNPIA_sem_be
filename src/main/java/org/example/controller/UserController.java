@@ -9,7 +9,7 @@ import org.example.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/user")
 @AllArgsConstructor
@@ -19,12 +19,11 @@ public class UserController {
     private UserService userService;
 
     @PutMapping
-    public ResponseEntity<Boolean> changePassword(@RequestBody ChangeUserLoginPasswordDto changeUserLoginPasswordDto
-            , @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> changePassword(@RequestBody ChangeUserLoginPasswordDto changeUserLoginPasswordDto) {
         if (userService.changePassword(changeUserLoginPasswordDto)) {
-            return ResponseEntity.ok(true);
+            return ResponseEntity.ok("Successfully changed password");
         }
-        return ResponseEntity.badRequest().body(false);
+        return ResponseEntity.badRequest().body("Somewhere appeared error while changing password");
     }
 
 }
