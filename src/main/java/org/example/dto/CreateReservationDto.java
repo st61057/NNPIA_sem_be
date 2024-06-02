@@ -5,10 +5,14 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class CreatingReservationDto {
+public class CreateReservationDto {
+
     private String email;
+
     private ProcedureDto procedure;
+
     private Date reservationDate;
+
     private TimeSlotDto time;
 
 }
