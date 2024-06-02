@@ -13,19 +13,13 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class Procedure {
 
-    public Procedure(String name, String description, Integer price) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-    }
-
     @Id
-    @Column
+    @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull
-    @Column
+    @Column(unique = true)
     private String name;
 
     @NotNull
@@ -38,7 +32,7 @@ public class Procedure {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(32) default 'INACTIVE'")
+    @Column(columnDefinition = "varchar(32) default 'INVALID'")
     private ReservationValidity status;
 
 }

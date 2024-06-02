@@ -9,10 +9,10 @@ import org.example.enums.ReservationStatus;
 import org.example.enums.ReservationValidity;
 import org.example.repository.ProcedureRepository;
 import org.example.repository.ReservationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -20,10 +20,8 @@ import java.util.Optional;
 @NoArgsConstructor
 public class ProcedureService {
 
-    @Autowired
     private ProcedureRepository procedureRepository;
 
-    @Autowired
     private ReservationRepository reservationRepository;
 
     public List<Procedure> findAll() {
@@ -37,6 +35,7 @@ public class ProcedureService {
     public Procedure findByName(String name) {
         return procedureRepository.findByName(name);
     }
+
     public boolean doesProcedureExists(Integer id) {
         Optional<Procedure> procedure = procedureRepository.findById(id);
         return procedure.isPresent();
@@ -55,31 +54,33 @@ public class ProcedureService {
     }
 
     public Procedure updateProcedure(Procedure procedure) {
-        Optional<Procedure> existingProcedure = procedureRepository.findById(procedure.getId());
-        if (existingProcedure.isPresent()) {
-            existingProcedure.get().setName(procedure.getName());
-            existingProcedure.get().setDescription(procedure.getDescription());
-            existingProcedure.get().setStatus(procedure.getStatus());
-            existingProcedure.get().setPrice(procedure.getPrice());
-            return procedureRepository.save(existingProcedure.get());
-        } else {
-            throw new RuntimeException("Procedure doesn't exist!");
-        }
+        Procedure existingProcedure = findById(procedure.getId());
+        existingProcedure.setName(procedure.getName());
+        existingProcedure.setDescription(procedure.getDescription());
+        existingProcedure.setStatus(procedure.getStatus());
+        existingProcedure.setPrice(procedure.getPrice());
+        return procedureRepository.save(existingProcedure);
     }
 
     public Procedure deleteProcedure(Integer id) {
+        Procedure procedure = findById(id);
+        List<Reservation> reservationList = reservationRepository.findReservationsByProcedureId(procedure.getId());
+        if (!reservationList.isEmpty()) {
+            for (Reservation reservation : reservationList) {
+                reservation.setStatus(ReservationStatus.CANCELED);
+                reservationRepository.save(reservation);
+            }
+        }
+        procedureRepository.deleteById(id);
+        return procedure;
+    }
+
+    public Procedure findById(Integer id) {
         Optional<Procedure> procedure = procedureRepository.findById(id);
         if (procedure.isPresent()) {
-            List<Reservation> reservationList = reservationRepository.findReservationsByProcedureId(procedure.get().getId());
-            if (!reservationList.isEmpty()) {
-                for (Reservation reservation : reservationList) {
-                    reservation.setStatus(ReservationStatus.CANCELED);
-                    reservationRepository.save(reservation);
-                }
-            }
-            procedureRepository.deleteById(id);
             return procedure.get();
+        } else {
+            throw new NoSuchElementException("Procedure with id: " + id + " was not found!");
         }
-        throw new RuntimeException("Procedure doens't exist!");
     }
 }

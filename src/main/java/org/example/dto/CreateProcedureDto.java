@@ -1,15 +1,8 @@
 package org.example.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.validation.constraints.NotNull;
 
-@Getter
-@Setter
-public class ProcedureDto {
-
-    private Integer id;
+public class CreateProcedureDto {
 
     @NotNull
     private String name;
@@ -19,5 +12,4 @@ public class ProcedureDto {
 
     @NotNull
     private Integer price;
-
 }

@@ -9,10 +9,15 @@ import org.example.entity.Procedure;
 import org.example.entity.UserLogin;
 import org.example.service.ProcedureService;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping
 @AllArgsConstructor
@@ -22,6 +27,12 @@ public class ProcedureController {
     private ProcedureService procedureService;
 
     private ModelMapper modelMapper;
+
+    @GetMapping("/public/procedures")
+    public  ResponseEntity<?> getAll() {
+        List<Procedure> procedures = procedureService.findAll();
+        return ResponseEntity.ok(procedures.stream().map(this::convertProcedureToDto).collect(Collectors.toList()));
+    }
 
     @PutMapping(value = "/api/procedure")
     public ResponseEntity<?> addProcedure(@RequestBody ProcedureDto procedureDto, @AuthenticationPrincipal UserLogin userLogin) {
@@ -49,7 +60,7 @@ public class ProcedureController {
                 return ResponseEntity.badRequest().body("Delete procedure fail. Procedure doesn't exists.");
             }
             Procedure deletedProcedure = procedureService.deleteProcedure(id);
-            return ResponseEntity.ok("Procedure deleted successfully.");
+            return ResponseEntity.ok(deletedProcedure);
         } catch (Exception exception) {
             return ResponseEntity.badRequest().body("Delete procedure fail. There may be reservations for this procedure.");
         }
