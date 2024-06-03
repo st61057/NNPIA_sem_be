@@ -3,13 +3,12 @@ package org.example.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.example.Utils.DtoConverter;
+import org.example.dto.CreateProcedureDto;
 import org.example.dto.ProcedureDto;
 import org.example.entity.Procedure;
 import org.example.entity.UserLogin;
 import org.example.service.ProcedureService;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,13 +28,13 @@ public class ProcedureController {
     private ModelMapper modelMapper;
 
     @GetMapping("/public/procedures")
-    public  ResponseEntity<?> getAll() {
+    public ResponseEntity<?> getAll() {
         List<Procedure> procedures = procedureService.findAll();
         return ResponseEntity.ok(procedures.stream().map(this::convertProcedureToDto).collect(Collectors.toList()));
     }
 
     @PutMapping(value = "/api/procedure")
-    public ResponseEntity<?> addProcedure(@RequestBody ProcedureDto procedureDto, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> addProcedure(@RequestBody CreateProcedureDto procedureDto, @AuthenticationPrincipal UserLogin userLogin) {
         Procedure procedure = procedureService.createNewProcedure(procedureDto);
         if (procedure != null) {
             return ResponseEntity.ok(convertProcedureToDto(procedure));
