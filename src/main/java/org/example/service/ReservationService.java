@@ -61,8 +61,8 @@ public class ReservationService {
         return reservationPagingRepository.findAllByStatus(status, pageVariable);
     }
 
-    public Page<Reservation> findAllByStatusAAndReservationDate(Date reservationDate, ReservationStatus status, Pageable pageVariable) {
-        return reservationPagingRepository.findAllByStatusAAndReservationDate(reservationDate, status, pageVariable);
+    public Page<Reservation> findAllByStatusAndReservationDate(Date reservationDate, ReservationStatus status, Pageable pageVariable) {
+        return reservationPagingRepository.findAllByStatusAndReservationDate(reservationDate, status, pageVariable);
     }
 
     private Reservation findById(Integer id){

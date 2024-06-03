@@ -13,6 +13,6 @@ public interface ReservationPagingRepository extends PagingAndSortingRepository<
 
     Page<Reservation> findAllByStatus(ReservationStatus status, Pageable pageVariable);
 
-    Page<Reservation> findAllByStatusAAndReservationDate(Date reservationDate, ReservationStatus status, Pageable pageVariable);
+    Page<Reservation> findAllByStatusAndReservationDate(Date reservationDate, ReservationStatus status, Pageable pageVariable);
 
 }
