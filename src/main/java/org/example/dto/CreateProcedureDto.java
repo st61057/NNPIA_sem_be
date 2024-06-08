@@ -15,4 +15,7 @@ public class CreateProcedureDto {
 
     @NotNull
     private Integer price;
+
+    @NotNull
+    private Boolean checked;
 }
