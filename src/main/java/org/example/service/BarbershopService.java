@@ -1,7 +1,5 @@
 package org.example.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.example.dto.TimeSlotDto;
 import org.example.entity.Barbershop;
 import org.example.entity.Reservation;
@@ -19,19 +17,22 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
 public class BarbershopService {
 
-    private BarbershopRepository beautySalonRepository;
+    private BarbershopRepository barbershopRepository;
 
     private ReservationRepository reservationRepository;
 
-    public Barbershop findById(Long id) {
-        return beautySalonRepository.findBarbershopById(id);
+    public BarbershopService(BarbershopRepository barbershopRepository, ReservationRepository reservationRepository) {
+        this.barbershopRepository = barbershopRepository;
+        this.reservationRepository = reservationRepository;
     }
 
-    public List<TimeSlotDto> getTimeSlotsForDate(Date date, Long barbershopId) {
+    public Barbershop findById(Integer id) {
+        return barbershopRepository.findBarbershopById(id);
+    }
+
+    public List<TimeSlotDto> getTimeSlotsForDate(Date date, Integer barbershopId) {
         List<TimeSlotDto> timeSlots = new ArrayList<>();
         Barbershop barbershop = findById(barbershopId);
         LocalDateTime localDateTime = dateToLocaleDateTime(date);
