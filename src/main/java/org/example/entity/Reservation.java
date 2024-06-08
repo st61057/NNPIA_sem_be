@@ -8,6 +8,7 @@ import org.example.enums.ReservationStatus;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
@@ -30,6 +31,7 @@ public class Reservation {
 
     @NotNull
     @Column
+    @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
     @ManyToOne
@@ -38,6 +40,7 @@ public class Reservation {
 
     @NotNull
     @Column
+    @Temporal(TemporalType.DATE)
     private Date reservationDate;
 
     @NotNull
@@ -48,4 +51,7 @@ public class Reservation {
     @Column
     private LocalTime endTime;
 
+    @NotNull
+    @Column
+    private Timestamp createdTime;
 }

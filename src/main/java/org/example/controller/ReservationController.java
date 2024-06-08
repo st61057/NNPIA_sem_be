@@ -1,7 +1,5 @@
 package org.example.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.example.dto.*;
 import org.example.entity.Procedure;
 import org.example.entity.Reservation;
@@ -22,14 +20,12 @@ import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+//@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping()
-@AllArgsConstructor
-@NoArgsConstructor
 public class ReservationController {
 
-    private BarbershopService beautySalonService;
+    private BarbershopService barbershopService;
 
     private ProcedureService procedureService;
 
@@ -37,19 +33,43 @@ public class ReservationController {
 
     private ModelMapper modelMapper;
 
+    public ReservationController(BarbershopService barbershopService, ProcedureService procedureService, ReservationService reservationService, ModelMapper modelMapper) {
+        this.barbershopService = barbershopService;
+        this.procedureService = procedureService;
+        this.reservationService = reservationService;
+        this.modelMapper = modelMapper;
+    }
+
+
+    /*TODO dopsat nějaký endpoint co tohle bude dávat
+    http://localhost:8080/api/reservation/?salonId=1&date=2024-06-08&status=&size=3&page=0&sort=startTime,asc
+
+     */
     @GetMapping("/public/reservation")
-    public List<TimeSlotDto> getAll(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, Long id, @AuthenticationPrincipal UserLogin userLogin) {
-        return beautySalonService.getTimeSlotsForDate(date, id);
+    public List<TimeSlotDto> getAll(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, Integer id, @AuthenticationPrincipal UserLogin userLogin) {
+        return barbershopService.getTimeSlotsForDate(date, id);
     }
 
     @PostMapping("/public/reservation")
     public ResponseEntity<?> createReservation(@RequestBody @Valid CreateReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
         try {
-            Reservation reservation = convertToEntity(createReservationDtoIn);
+            Reservation reservation = convertToEntity(createReservationDtoIn, ReservationStatus.CREATED);
             ReservationResponseDto reservationCreated = convertToReservationDto(reservationService.createReservation(reservation));
             return ResponseEntity.status(200).body(reservationCreated);
         } catch (Exception exception) {
             return ResponseEntity.badRequest().body("Create reservation failed, maybe this time is already booked.");
+        }
+    }
+
+    @PostMapping("/public/reservation-locked")
+    public ResponseEntity<?> createLockedReservation(@RequestBody CreateReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
+        try {
+            createReservationDtoIn.setProcedure(convertProcedureToDto(procedureService.findById(0)));
+            Reservation reservation = convertToEntity(createReservationDtoIn, ReservationStatus.LOCKED);
+            ReservationResponseDto reservationCreated = convertToReservationDto(reservationService.createReservation(reservation));
+            return ResponseEntity.status(200).body(reservationCreated);
+        } catch (Exception exception) {
+            return ResponseEntity.status(400).body(exception.getMessage());
         }
     }
 
@@ -106,13 +126,14 @@ public class ReservationController {
     }
 
 
-    private Reservation convertToEntity(CreateReservationDto createReservationDtoIn) {
+    private Reservation convertToEntity(CreateReservationDto createReservationDtoIn, ReservationStatus status) {
         Reservation reservation = new Reservation();
         reservation.setEmail(createReservationDtoIn.getEmail());
         reservation.setReservationDate(createReservationDtoIn.getReservationDate());
         reservation.setStartTime(createReservationDtoIn.getTime().getStartTime());
         reservation.setEndTime(createReservationDtoIn.getTime().getEndTime());
-        reservation.setStatus(ReservationStatus.CREATED);
+        reservation.setCreatedTime(createReservationDtoIn.getCreatedDate());
+        reservation.setStatus(status);
         reservation.setProcedure(procedureService.findByName(createReservationDtoIn.getProcedure().getName()));
         return reservation;
     }

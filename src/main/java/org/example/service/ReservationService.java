@@ -12,27 +12,30 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
 public class ReservationService {
 
-    @Autowired
     private ReservationRepository reservationRepository;
 
     private ReservationPagingRepository reservationPagingRepository;
 
-    public Reservation createReservation(Reservation reservation) {
-        Reservation existingReservation = reservationRepository.findReservationByStartTimeBetweenAndEndTime(reservation.getReservationDate(), reservation.getStartTime(), reservation.getEndTime());
-        if (existingReservation == null) {
+    public ReservationService(ReservationRepository reservationRepository, ReservationPagingRepository reservationPagingRepository) {
+        this.reservationRepository = reservationRepository;
+        this.reservationPagingRepository = reservationPagingRepository;
+    }
+
+    public Reservation createReservation(Reservation reservation) throws Exception {
+        List<Reservation> existingReservations = reservationRepository.findReservationsByReservationDate(reservation.getReservationDate());
+        if (checkAvailability(reservation, existingReservations)) {
             reservationRepository.save(reservation);
             return reservation;
         }
-        throw new RuntimeException("This time slot is already reserved");
+        throw new Exception("This time slot is currently locked try again in several minutes");
     }
 
     public Reservation confirmReservation(Integer id) {
@@ -65,12 +68,24 @@ public class ReservationService {
         return reservationPagingRepository.findAllByStatusAndReservationDate(reservationDate, status, pageVariable);
     }
 
-    private Reservation findById(Integer id){
+    private Reservation findById(Integer id) {
         Optional<Reservation> reservation = reservationRepository.findById(id);
         if (reservation.isPresent()) {
             return reservation.get();
         } else {
             throw new NoSuchElementException("Reservation with id " + id + " was not found!");
         }
+    }
+
+    private boolean checkAvailability(Reservation reservation, List<Reservation> reservations) {
+        boolean canBeCreated = true;
+        for (Reservation reservationFromDb : reservations) {
+            if (!(reservation.getStartTime().plusMinutes(1).isBefore(reservationFromDb.getStartTime()) && reservation.getEndTime().minusMinutes(1).isBefore(reservationFromDb.getStartTime())) &&
+                    !(reservation.getStartTime().plusMinutes(1).isAfter(reservationFromDb.getEndTime()) && reservation.getEndTime().minusMinutes(1).isAfter(reservationFromDb.getEndTime()))) {
+                canBeCreated = false;
+                break;
+            }
+        }
+        return canBeCreated;
     }
 }
