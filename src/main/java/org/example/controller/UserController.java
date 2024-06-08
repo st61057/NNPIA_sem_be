@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/user")
-@AllArgsConstructor
-@NoArgsConstructor
 public class UserController {
 
     private UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PutMapping
     public ResponseEntity<?> changePassword(@RequestBody ChangeUserLoginPasswordDto changeUserLoginPasswordDto) {
