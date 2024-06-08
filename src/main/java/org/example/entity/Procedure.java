@@ -1,7 +1,7 @@
 package org.example.entity;
 
 import lombok.*;
-import org.example.enums.ReservationValidity;
+import org.example.enums.ProcedureValidity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -33,6 +33,6 @@ public class Procedure {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(32) default 'INVALID'")
-    private ReservationValidity status;
+    private ProcedureValidity status;
 
 }

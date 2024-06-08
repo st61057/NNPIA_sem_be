@@ -20,4 +20,7 @@ public class ProcedureDto {
     @NotNull
     private Integer price;
 
+    @NotNull
+    private Boolean checked;
+
 }

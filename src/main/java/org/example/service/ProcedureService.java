@@ -1,16 +1,12 @@
 package org.example.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.example.dto.CreateProcedureDto;
 import org.example.dto.ProcedureDto;
 import org.example.entity.Procedure;
 import org.example.entity.Reservation;
 import org.example.enums.ReservationStatus;
-import org.example.enums.ReservationValidity;
+import org.example.enums.ProcedureValidity;
 import org.example.repository.ProcedureRepository;
 import org.example.repository.ReservationRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,22 +14,19 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
 public class ProcedureService {
 
     private ProcedureRepository procedureRepository;
 
     private ReservationRepository reservationRepository;
 
-    private ModelMapper modelMapper;
-
-    public List<Procedure> findAll() {
-        return procedureRepository.findAll();
+    public ProcedureService(ProcedureRepository procedureRepository, ReservationRepository reservationRepository) {
+        this.procedureRepository = procedureRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     public List<Procedure> findAllActive() {
-        return procedureRepository.findAllByStatus(ReservationValidity.VALID);
+        return procedureRepository.findAllByStatus(ProcedureValidity.ACTIVE);
     }
 
     public Procedure findByName(String name) {
@@ -49,20 +42,19 @@ public class ProcedureService {
         return findByName(name) != null;
     }
 
-    public Procedure createNewProcedure(CreateProcedureDto createProcedureDto) {
-        if (procedureRepository.findByName(createProcedureDto.getName()) != null) {
+    public Procedure createNewProcedure(Procedure procedure) {
+        if (procedureRepository.findByName(procedure.getName()) != null) {
             throw new RuntimeException("Procedure already exists!");
         }
 
-        Procedure procedure = convertToEntity(createProcedureDto);
         return procedureRepository.save(procedure);
     }
 
-    public Procedure updateProcedure(Procedure procedure) {
+    public Procedure updateProcedure(ProcedureDto procedure) {
         Procedure existingProcedure = findById(procedure.getId());
         existingProcedure.setName(procedure.getName());
         existingProcedure.setDescription(procedure.getDescription());
-        existingProcedure.setStatus(procedure.getStatus());
+        existingProcedure.setStatus(procedure.getChecked() ? ProcedureValidity.ACTIVE : ProcedureValidity.INACTIVE);
         existingProcedure.setPrice(procedure.getPrice());
         return procedureRepository.save(existingProcedure);
     }
@@ -88,21 +80,5 @@ public class ProcedureService {
             throw new NoSuchElementException("Procedure with id: " + id + " was not found!");
         }
     }
-
-    private Procedure convertToEntity(CreateProcedureDto createProcedureDto) {
-        Procedure procedure = modelMapper.map(createProcedureDto, Procedure.class);
-        procedure.setName(createProcedureDto.getName());
-        procedure.setPrice(createProcedureDto.getPrice());
-        procedure.setDescription(createProcedureDto.getDescription());
-        return procedure;
-    }
-
-    private ProcedureDto convertToDto(Procedure beautyProcedure) {
-        ProcedureDto procedureDto = modelMapper.map(beautyProcedure, ProcedureDto.class);
-        procedureDto.setName(beautyProcedure.getName());
-        procedureDto.setPrice(beautyProcedure.getPrice());
-        return procedureDto;
-    }
-
 
 }

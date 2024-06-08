@@ -1,13 +1,12 @@
 package org.example.controller;
 
-
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.example.dto.CreateProcedureDto;
 import org.example.dto.ProcedureDto;
 import org.example.entity.Procedure;
 import org.example.entity.UserLogin;
+import org.example.enums.ProcedureValidity;
 import org.example.service.ProcedureService;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,41 +18,45 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping
-@AllArgsConstructor
-@NoArgsConstructor
 public class ProcedureController {
 
-    private ProcedureService procedureService;
+    private final ProcedureService procedureService;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+
+    public ProcedureController(ProcedureService procedureService, ModelMapper modelMapper) {
+        this.procedureService = procedureService;
+        this.modelMapper = modelMapper;
+    }
 
     @GetMapping("/public/procedures")
     public ResponseEntity<?> getAll() {
-        List<Procedure> procedures = procedureService.findAll();
+        List<Procedure> procedures = procedureService.findAllActive();
         return ResponseEntity.ok(procedures.stream().map(this::convertProcedureToDto).collect(Collectors.toList()));
     }
 
-    @PutMapping(value = "/api/procedure")
+    @PostMapping(value = "/api/procedure-add")
     public ResponseEntity<?> addProcedure(@RequestBody CreateProcedureDto procedureDto, @AuthenticationPrincipal UserLogin userLogin) {
-        Procedure procedure = procedureService.createNewProcedure(procedureDto);
-        if (procedure != null) {
-            return ResponseEntity.ok(convertProcedureToDto(procedure));
+        Procedure procedure = convertToEntity(procedureDto);
+        Procedure createdProcedure = procedureService.createNewProcedure(procedure);
+        if (createdProcedure != null) {
+            return ResponseEntity.ok(convertProcedureToDto(createdProcedure));
         }
         return ResponseEntity.badRequest().body("Error");
     }
 
-    @PostMapping(value = "/api/procedure")
+    @PutMapping(value = "/api/procedure-update")
     public ResponseEntity<?> updateProcedure(@RequestBody ProcedureDto procedureDto, @AuthenticationPrincipal UserLogin userLogin) {
         boolean procedureValidity = procedureService.doesProcedureExists(procedureDto.getName());
         if (!procedureValidity) {
             return ResponseEntity.badRequest().body("Error");
         }
-        Procedure procedure = procedureService.updateProcedure(procedureService.findByName(procedureDto.getName()));
+        Procedure procedure = procedureService.updateProcedure(procedureDto);
         return ResponseEntity.ok(convertProcedureToDto(procedure));
     }
 
-    @DeleteMapping(value = "api/procedure")
-    public ResponseEntity<?> deleteProcedure(Integer id, @AuthenticationPrincipal UserLogin userLogin) {
+    @DeleteMapping(value = "/api/procedure-delete/{id}")
+    public ResponseEntity<?> deleteProcedure(@PathVariable Integer id, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             if (!procedureService.doesProcedureExists(id)) {
                 return ResponseEntity.badRequest().body("Delete procedure fail. Procedure doesn't exists.");
@@ -65,11 +68,27 @@ public class ProcedureController {
         }
     }
 
-    public ProcedureDto convertProcedureToDto(Procedure procedure) {
+    private ProcedureDto convertProcedureToDto(Procedure procedure) {
         ProcedureDto procedureDto = modelMapper.map(procedure, ProcedureDto.class);
         procedureDto.setName(procedure.getName());
         procedureDto.setPrice(procedure.getPrice());
         procedureDto.setDescription(procedure.getDescription());
+        return procedureDto;
+    }
+
+    private Procedure convertToEntity(CreateProcedureDto createProcedureDto) {
+        Procedure procedure = modelMapper.map(createProcedureDto, Procedure.class);
+        procedure.setName(createProcedureDto.getName());
+        procedure.setPrice(createProcedureDto.getPrice());
+        procedure.setDescription(createProcedureDto.getDescription());
+        procedure.setStatus(createProcedureDto.getChecked() ? ProcedureValidity.ACTIVE : ProcedureValidity.INACTIVE);
+        return procedure;
+    }
+
+    private ProcedureDto convertToDto(Procedure procedure) {
+        ProcedureDto procedureDto = modelMapper.map(procedure, ProcedureDto.class);
+        procedureDto.setName(procedure.getName());
+        procedureDto.setPrice(procedure.getPrice());
         return procedureDto;
     }
 
