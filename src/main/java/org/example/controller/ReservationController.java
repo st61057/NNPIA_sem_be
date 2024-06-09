@@ -40,24 +40,19 @@ public class ReservationController {
         this.modelMapper = modelMapper;
     }
 
-
-    /*TODO dopsat nějaký endpoint co tohle bude dávat
-    http://localhost:8080/api/reservation/?salonId=1&date=2024-06-08&status=&size=3&page=0&sort=startTime,asc
-
-     */
     @GetMapping("/public/reservation")
     public List<TimeSlotDto> getAll(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, Integer id, @AuthenticationPrincipal UserLogin userLogin) {
         return barbershopService.getTimeSlotsForDate(date, id);
     }
 
     @PostMapping("/public/reservation")
-    public ResponseEntity<?> createReservation(@RequestBody @Valid CreateReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> updateReservation(@RequestBody @Valid CreateReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             Reservation reservation = convertToEntity(createReservationDtoIn, ReservationStatus.CREATED);
-            ReservationResponseDto reservationCreated = convertToReservationDto(reservationService.createReservation(reservation));
+            ReservationResponseDto reservationCreated = convertToReservationDto(reservationService.updateReservation(reservation));
             return ResponseEntity.status(200).body(reservationCreated);
         } catch (Exception exception) {
-            return ResponseEntity.badRequest().body("Create reservation failed, maybe this time is already booked.");
+            return ResponseEntity.status(400).body("Create reservation failed, maybe this time is already booked.");
         }
     }
 
@@ -73,35 +68,46 @@ public class ReservationController {
         }
     }
 
+    @PostMapping("/public/reservation-locked-1")
+    public ResponseEntity<?> deleteLockedReservation(@RequestBody CreateReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
+        try {
+            createReservationDtoIn.setProcedure(convertProcedureToDto(procedureService.findById(0)));
+            Reservation reservation = convertToEntity(createReservationDtoIn, ReservationStatus.LOCKED);
+            ReservationResponseDto reservationCreated = convertToReservationDto(reservationService.deleteReservation(reservation));
+            return ResponseEntity.status(200).body(reservationCreated);
+        } catch (Exception exception) {
+            return ResponseEntity.status(400).body(exception.getMessage());
+        }
+    }
+
     @PutMapping("/api/reservation/confirm")
     public ResponseEntity<?> confirmReservation(@RequestBody Integer resId, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.confirmReservation(resId));
             return ResponseEntity.status(200).body(reservation);
         } catch (Exception exception) {
-            return ResponseEntity.badRequest().body("Confirm reservation failed.");
+            return ResponseEntity.status(400).body("Confirm reservation failed.");
         }
     }
 
-    @PutMapping("/api/reservation/asDone")
-    public ResponseEntity<?> setAsDone(@RequestBody Integer resId, @AuthenticationPrincipal UserLogin userLogin) {
+    @PutMapping("/api/reservation/asDone/{resId}")
+    public ResponseEntity<?> setAsDone(@PathVariable Integer resId, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.setAsDone(resId));
             return ResponseEntity.status(200).body(reservation);
         } catch (Exception exception) {
-            return ResponseEntity.badRequest().body("Setting reservation as done failed.");
+            return ResponseEntity.status(400).body("Setting reservation as done failed.");
         }
     }
 
-    @PutMapping("/api/reservation/cancel")
-    public ResponseEntity<?> cancelReservation(@RequestBody Integer cancelDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
+    @PutMapping("/api/reservation/cancel/{cancelDtoIn}")
+    public ResponseEntity<?> cancelReservation(@PathVariable Integer cancelDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.cancelReservation(cancelDtoIn));
             return ResponseEntity.status(200).body(reservation);
         } catch (Exception exception) {
-            return ResponseEntity.badRequest().body("Cancel reservation failed.");
+            return ResponseEntity.status(400).body("Cancel reservation failed.");
         }
-
     }
 
     @GetMapping("/api/reservation/by-email-date-and-status")
@@ -111,9 +117,9 @@ public class ReservationController {
         return ResponseEntity.ok(reservationPagingDto);
     }
 
-    @GetMapping("/api/reservation/by-date-and-status")
+    @GetMapping("/api/reservation/")
     public ResponseEntity<?> getAllByDateAndStatus(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, ReservationStatus status, Pageable pageable) {
-        Page<Reservation> pagedResult = reservationService.findAllByStatusAndReservationDate(date, status, pageable);
+        Page<Reservation> pagedResult = reservationService.findAllByReservationDateAndStatus(date, status, pageable);
         ReservationPagingDto reservationPagingDto = convertToPagingDto(pagedResult);
         return ResponseEntity.ok(reservationPagingDto);
     }

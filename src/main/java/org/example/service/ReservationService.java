@@ -1,12 +1,9 @@
 package org.example.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.example.entity.Reservation;
 import org.example.enums.ReservationStatus;
 import org.example.repository.ReservationPagingRepository;
 import org.example.repository.ReservationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,9 +21,12 @@ public class ReservationService {
 
     private ReservationPagingRepository reservationPagingRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, ReservationPagingRepository reservationPagingRepository) {
+    private CleanService cleanService;
+
+    public ReservationService(ReservationRepository reservationRepository, ReservationPagingRepository reservationPagingRepository, CleanService cleanService) {
         this.reservationRepository = reservationRepository;
         this.reservationPagingRepository = reservationPagingRepository;
+        this.cleanService = cleanService;
     }
 
     public Reservation createReservation(Reservation reservation) throws Exception {
@@ -36,6 +36,26 @@ public class ReservationService {
             return reservation;
         }
         throw new Exception("This time slot is currently locked try again in several minutes");
+    }
+
+    public Reservation updateReservation(Reservation reservation) throws Exception {
+        Reservation existingReservation = reservationRepository.findReservationByReservationDateAndStartTimeAndEndTime(reservation.getReservationDate(), reservation.getStartTime(), reservation.getEndTime());
+        if (existingReservation != null) {
+            cleanService.cleanLockedReservation(existingReservation.getId());
+            reservationRepository.save(reservation);
+            return reservation;
+        }
+        throw new Exception("This reservation doesn't exist");
+    }
+
+
+    public Reservation deleteReservation(Reservation reservation) throws Exception {
+        Reservation existingReservation = reservationRepository.findReservationByReservationDateAndStartTimeAndEndTime(reservation.getReservationDate(), reservation.getStartTime(), reservation.getEndTime());
+        if (existingReservation != null) {
+            reservationRepository.delete(existingReservation);
+            return reservation;
+        }
+        throw new Exception("This reservation doesn't exist");
     }
 
     public Reservation confirmReservation(Integer id) {
@@ -64,8 +84,8 @@ public class ReservationService {
         return reservationPagingRepository.findAllByStatus(status, pageVariable);
     }
 
-    public Page<Reservation> findAllByStatusAndReservationDate(Date reservationDate, ReservationStatus status, Pageable pageVariable) {
-        return reservationPagingRepository.findAllByStatusAndReservationDate(reservationDate, status, pageVariable);
+    public Page<Reservation> findAllByReservationDateAndStatus(Date reservationDate, ReservationStatus status, Pageable pageVariable) {
+        return reservationPagingRepository.findAllByReservationDateAndStatus(reservationDate, status, pageVariable);
     }
 
     private Reservation findById(Integer id) {
