@@ -30,16 +30,16 @@ public class UserService {
         return userLogin;
     }
 
-    public void addUser(String username, String email, String password) {
+    public UserLogin addUser(String username, String email, String password) throws Exception {
         UserLogin existingUserLogin = findLoginByUsername(username);
-
         if (existingUserLogin == null) {
             UserLogin userLogin = new UserLogin();
             userLogin.setUsername(username);
             userLogin.setEmail(email);
             userLogin.setPassword(password);
+            return loginRepository.save(userLogin);
         }
-
+        throw new Exception("User with this username already exists");
     }
 
     public boolean changePassword(ChangeUserLoginPasswordDto changeUserLoginPasswordDto) {
