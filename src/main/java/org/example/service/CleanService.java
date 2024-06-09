@@ -21,12 +21,16 @@ public class CleanService {
         this.reservationRepository = reservationRepository;
     }
 
-    @Scheduled(fixedRate = 300000) //ms
+    @Scheduled(fixedRate = 60000) //ms
     @Transactional
-    public void cleanupOldRecords() {
-        LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
-        List<Reservation> expiredReservations = reservationRepository.findReservationsByStatusAndCreatedTimeBefore(ReservationStatus.LOCKED,Timestamp.valueOf(fiveMinutesAgo));
+    public void cleanLockedOldRecords() {
+        LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(1);
+        List<Reservation> expiredReservations = reservationRepository.findReservationsByStatusAndCreatedTimeBefore(ReservationStatus.LOCKED, Timestamp.valueOf(fiveMinutesAgo));
         reservationRepository.deleteAll(expiredReservations);
-        System.out.println("Cleanup job ran at " + LocalDateTime.now() + ". Deleted records: " + expiredReservations.size());
+    }
+
+    public void cleanLockedReservation(Integer id) {
+        Reservation expiredReservations = reservationRepository.findReservationById(id);
+        reservationRepository.delete(expiredReservations);
     }
 }
