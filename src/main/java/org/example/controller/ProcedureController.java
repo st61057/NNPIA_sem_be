@@ -29,9 +29,15 @@ public class ProcedureController {
         this.modelMapper = modelMapper;
     }
 
+    @GetMapping("/public/procedures-active")
+    public ResponseEntity<?> getAllActive() {
+        List<Procedure> procedures = procedureService.findAllActive();
+        return ResponseEntity.ok(procedures.stream().map(this::convertProcedureToDto).collect(Collectors.toList()));
+    }
+
     @GetMapping("/public/procedures")
     public ResponseEntity<?> getAll() {
-        List<Procedure> procedures = procedureService.findAllActive();
+        List<Procedure> procedures = procedureService.findAll();
         return ResponseEntity.ok(procedures.stream().map(this::convertProcedureToDto).collect(Collectors.toList()));
     }
 
@@ -73,6 +79,7 @@ public class ProcedureController {
         procedureDto.setName(procedure.getName());
         procedureDto.setPrice(procedure.getPrice());
         procedureDto.setDescription(procedure.getDescription());
+        procedureDto.setChecked(procedure.getStatus().equals(ProcedureValidity.ACTIVE) ? true : false);
         return procedureDto;
     }
 

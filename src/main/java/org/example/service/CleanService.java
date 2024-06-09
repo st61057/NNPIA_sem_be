@@ -2,7 +2,6 @@ package org.example.service;
 
 import org.example.entity.Reservation;
 import org.example.enums.ReservationStatus;
-import org.example.repository.ReservationPagingRepository;
 import org.example.repository.ReservationRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

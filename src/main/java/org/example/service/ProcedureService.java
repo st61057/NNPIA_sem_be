@@ -29,6 +29,10 @@ public class ProcedureService {
         return procedureRepository.findAllByStatus(ProcedureValidity.ACTIVE);
     }
 
+    public List<Procedure> findAll() {
+        return procedureRepository.findAll();
+    }
+
     public Procedure findByName(String name) {
         return procedureRepository.findByName(name);
     }
