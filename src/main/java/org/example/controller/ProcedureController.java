@@ -79,7 +79,7 @@ public class ProcedureController {
         procedureDto.setName(procedure.getName());
         procedureDto.setPrice(procedure.getPrice());
         procedureDto.setDescription(procedure.getDescription());
-        procedureDto.setChecked(procedure.getStatus().equals(ProcedureValidity.ACTIVE) ? true : false);
+        procedureDto.setChecked(procedure.getStatus().equals(ProcedureValidity.ACTIVE));
         return procedureDto;
     }
 
@@ -90,13 +90,6 @@ public class ProcedureController {
         procedure.setDescription(createProcedureDto.getDescription());
         procedure.setStatus(createProcedureDto.getChecked() ? ProcedureValidity.ACTIVE : ProcedureValidity.INACTIVE);
         return procedure;
-    }
-
-    private ProcedureDto convertToDto(Procedure procedure) {
-        ProcedureDto procedureDto = modelMapper.map(procedure, ProcedureDto.class);
-        procedureDto.setName(procedure.getName());
-        procedureDto.setPrice(procedure.getPrice());
-        return procedureDto;
     }
 
 }

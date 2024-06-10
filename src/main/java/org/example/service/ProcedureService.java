@@ -68,11 +68,10 @@ public class ProcedureService {
         List<Reservation> reservationList = reservationRepository.findReservationsByProcedureId(procedure.getId());
         if (!reservationList.isEmpty()) {
             for (Reservation reservation : reservationList) {
-                reservation.setStatus(ReservationStatus.CANCELED);
-                reservationRepository.save(reservation);
+                reservationRepository.delete(reservation);
             }
         }
-        procedureRepository.deleteById(id);
+        procedureRepository.delete(procedure);
         return procedure;
     }
 

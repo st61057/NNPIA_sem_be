@@ -40,6 +40,8 @@ public class BarbershopService {
             return new ArrayList<>();
         }
         List<Reservation> reservations = reservationRepository.findReservationsByReservationDateAndStatus(date, ReservationStatus.CONFIRMED);
+        reservations.addAll(reservationRepository.findReservationsByReservationDateAndStatus(date, ReservationStatus.CREATED));
+        reservations.addAll(reservationRepository.findReservationsByReservationDateAndStatus(date, ReservationStatus.LOCKED));
         LocalTime openingTime = barbershop.getOpeningTime();
         LocalTime closingTime = barbershop.getClosingTime();
 
