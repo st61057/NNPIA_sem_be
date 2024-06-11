@@ -13,31 +13,26 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class JwtUtil {
+public class JwtService {
 
     private final String secretKey = "mysecretkey";
     private long accessTokenValidity = 60 * 60 * 1000;
 
     private final JwtParser jwtParser;
 
-    private final String TOKEN_HEADER = "Authorization";
-    private final String TOKEN_PREFIX = "Bearer ";
-
-    public JwtUtil() {
+    public JwtService() {
         this.jwtParser = Jwts.parser().setSigningKey(secretKey);
     }
 
-    public String createToken(UserLoginDto userLogin) {
-        Claims claims = Jwts.claims().setSubject(userLogin.getUsername());
-        claims.put("username", userLogin.getUsername());
-
-        Date tokenCreateTime = new Date();
-        Date tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(accessTokenValidity));
-        return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(tokenValidity)
+    public String createToken(UserLogin userLogin) {
+        String token = Jwts
+                .builder()
+                .setSubject(userLogin.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidity))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+        return token;
     }
 
     public Boolean validateToken(String token, UserDetails userLogin) {

@@ -12,4 +12,8 @@ public class Conf {
         return new ModelMapper();
     }
 
+    @Bean
+    public JwtAuthenticationFilter authenticationTokenFilterBean() throws Exception {
+        return new JwtAuthenticationFilter();
+    }
 }
