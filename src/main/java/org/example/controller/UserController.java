@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 public class UserController {
 
-    private UserLoginService userLoginService;
+    private final UserLoginService userLoginService;
 
     public UserController(UserLoginService userLoginService) {
         this.userLoginService = userLoginService;

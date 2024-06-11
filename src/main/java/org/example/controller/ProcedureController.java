@@ -3,13 +3,10 @@ package org.example.controller;
 import org.example.dto.CreateProcedureDto;
 import org.example.dto.ProcedureDto;
 import org.example.entity.Procedure;
-import org.example.entity.UserLogin;
 import org.example.enums.ProcedureValidity;
 import org.example.service.ProcedureService;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

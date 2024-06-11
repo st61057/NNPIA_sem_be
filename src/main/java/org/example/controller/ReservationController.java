@@ -3,7 +3,6 @@ package org.example.controller;
 import org.example.dto.*;
 import org.example.entity.Procedure;
 import org.example.entity.Reservation;
-import org.example.entity.UserLogin;
 import org.example.enums.ReservationStatus;
 import org.example.service.BarbershopService;
 import org.example.service.ProcedureService;
@@ -14,11 +13,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -29,13 +25,13 @@ import java.util.stream.Collectors;
 @RequestMapping()
 public class ReservationController {
 
-    private BarbershopService barbershopService;
+    private final BarbershopService barbershopService;
 
-    private ProcedureService procedureService;
+    private final ProcedureService procedureService;
 
-    private ReservationService reservationService;
+    private final ReservationService reservationService;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     public ReservationController(BarbershopService barbershopService, ProcedureService procedureService, ReservationService reservationService, ModelMapper modelMapper) {
         this.barbershopService = barbershopService;

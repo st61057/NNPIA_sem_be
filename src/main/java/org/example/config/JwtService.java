@@ -1,22 +1,18 @@
 package org.example.config;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.example.dto.UserLoginDto;
 import org.example.entity.UserLogin;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class JwtService {
 
     private final String secretKey = "mysecretkey";
-    private long accessTokenValidity = 60 * 60 * 1000;
+    private final long accessTokenValidity = 60 * 60 * 1000;
 
     private final JwtParser jwtParser;
 

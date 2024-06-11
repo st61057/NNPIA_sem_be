@@ -2,19 +2,12 @@ package org.example.controller;
 
 import org.example.config.JwtService;
 import org.example.dto.AuthenticationResponse;
-import org.example.dto.UserLoginDto;
 import org.example.entity.AuthToken;
 import org.example.entity.UserLogin;
-import org.example.repository.UserLoginRepository;
 import org.example.service.AuthenticationService;
 import org.example.service.UserLoginService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -22,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    private UserLoginService userLoginService;
+    private final UserLoginService userLoginService;
 
     public AuthenticationController(AuthenticationService authenticationService, JwtService jwtService, UserLoginService userLoginService) {
         this.authenticationService = authenticationService;

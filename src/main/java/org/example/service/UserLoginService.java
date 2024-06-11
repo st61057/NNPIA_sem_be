@@ -68,9 +68,4 @@ public class UserLoginService implements UserDetailsService {
         return login;
     }
 
-    private List<SimpleGrantedAuthority> getAuthority() {
-        return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-    }
-
-
 }
