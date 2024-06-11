@@ -10,6 +10,7 @@ import org.example.service.ProcedureService;
 import org.example.service.ReservationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
-//@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping()
 public class ReservationController {
@@ -41,12 +45,12 @@ public class ReservationController {
     }
 
     @GetMapping("/public/reservation")
-    public List<TimeSlotDto> getAll(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, Integer id, @AuthenticationPrincipal UserLogin userLogin) {
+    public List<TimeSlotDto> getAll(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, Integer id) {
         return barbershopService.getTimeSlotsForDate(date, id);
     }
 
     @PostMapping("/public/reservation")
-    public ResponseEntity<?> updateReservation(@RequestBody @Valid CreateReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> updateReservation(@RequestBody @Valid CreateReservationDto createReservationDtoIn) {
         try {
             Reservation reservation = convertToEntity(createReservationDtoIn, ReservationStatus.CREATED);
             ReservationResponseDto reservationCreated = convertToReservationDto(reservationService.updateReservation(reservation));
@@ -57,7 +61,7 @@ public class ReservationController {
     }
 
     @PostMapping("/public/reservation-locked")
-    public ResponseEntity<?> createLockedReservation(@RequestBody CreateReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> createLockedReservation(@RequestBody CreateReservationDto createReservationDtoIn) {
         try {
             createReservationDtoIn.setProcedure(convertProcedureToDto(procedureService.findById(0)));
             Reservation reservation = convertToEntity(createReservationDtoIn, ReservationStatus.LOCKED);
@@ -68,8 +72,8 @@ public class ReservationController {
         }
     }
 
-    @PostMapping("/public/reservation-locked-1")
-    public ResponseEntity<?> deleteLockedReservation(@RequestBody CreateReservationDto createReservationDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
+    @PostMapping("/public/reservation-locked-temp")
+    public ResponseEntity<?> deleteLockedReservation(@RequestBody CreateReservationDto createReservationDtoIn) {
         try {
             createReservationDtoIn.setProcedure(convertProcedureToDto(procedureService.findById(0)));
             Reservation reservation = convertToEntity(createReservationDtoIn, ReservationStatus.LOCKED);
@@ -81,7 +85,7 @@ public class ReservationController {
     }
 
     @PutMapping("/api/reservation/confirm")
-    public ResponseEntity<?> confirmReservation(@RequestBody Integer resId, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> confirmReservation(@RequestBody Integer resId) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.confirmReservation(resId));
             return ResponseEntity.status(200).body(reservation);
@@ -91,7 +95,7 @@ public class ReservationController {
     }
 
     @PutMapping("/api/reservation/asDone/{resId}")
-    public ResponseEntity<?> setAsDone(@PathVariable Integer resId, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> setAsDone(@PathVariable Integer resId) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.setAsDone(resId));
             return ResponseEntity.status(200).body(reservation);
@@ -101,7 +105,7 @@ public class ReservationController {
     }
 
     @PutMapping("/api/reservation/cancel/{cancelDtoIn}")
-    public ResponseEntity<?> cancelReservation(@PathVariable Integer cancelDtoIn, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> cancelReservation(@PathVariable Integer cancelDtoIn) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.cancelReservation(cancelDtoIn));
             return ResponseEntity.status(200).body(reservation);
@@ -119,7 +123,18 @@ public class ReservationController {
 
     @GetMapping("/api/reservation/")
     public ResponseEntity<?> getAllByDateAndStatus(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, ReservationStatus status, Pageable pageable) {
-        Page<Reservation> pagedResult = reservationService.findAllByReservationDateAndStatus(date, status, pageable);
+        Page<Reservation> pagedResult;
+        if (status.equals(ReservationStatus.ALL)) {
+            Page<Reservation> pageCreated = reservationService.findAllByReservationDateAndStatus(date, ReservationStatus.CREATED, pageable);
+            Page<Reservation> pagedConfirmed = reservationService.findAllByReservationDateAndStatus(date, ReservationStatus.CONFIRMED, pageable);
+            Page<Reservation> pagedDone = reservationService.findAllByReservationDateAndStatus(date, ReservationStatus.DONE, pageable);
+            Page<Reservation> pagedCancelled = reservationService.findAllByReservationDateAndStatus(date, ReservationStatus.CANCELED, pageable);
+            Page<Reservation> pagedLocked = reservationService.findAllByReservationDateAndStatus(date, ReservationStatus.LOCKED, pageable);
+            List<Reservation> merged = mergePages(pageCreated, pagedConfirmed, pagedDone, pagedCancelled, pagedLocked);
+            pagedResult = new PageImpl<>(merged, pageable, merged.size());
+        } else {
+            pagedResult = reservationService.findAllByReservationDateAndStatus(date, status, pageable);
+        }
         ReservationPagingDto reservationPagingDto = convertToPagingDto(pagedResult);
         return ResponseEntity.ok(reservationPagingDto);
     }
@@ -164,12 +179,18 @@ public class ReservationController {
         }
     }
 
-    public ProcedureDto convertProcedureToDto(Procedure procedure) {
+    private ProcedureDto convertProcedureToDto(Procedure procedure) {
         ProcedureDto procedureDto = modelMapper.map(procedure, ProcedureDto.class);
         procedureDto.setName(procedure.getName());
         procedureDto.setPrice(procedure.getPrice());
         procedureDto.setDescription(procedure.getDescription());
         return procedureDto;
+    }
+
+    private List<Reservation> mergePages(Page<Reservation>... pages) {
+        return Arrays.stream(pages)
+                .flatMap(page -> page.getContent().stream())
+                .collect(Collectors.toList());
     }
 
 }

@@ -42,7 +42,7 @@ public class ProcedureController {
     }
 
     @PostMapping(value = "/api/procedure-add")
-    public ResponseEntity<?> addProcedure(@RequestBody CreateProcedureDto procedureDto, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> addProcedure(@RequestBody CreateProcedureDto procedureDto) {
         Procedure procedure = convertToEntity(procedureDto);
         Procedure createdProcedure = procedureService.createNewProcedure(procedure);
         if (createdProcedure != null) {
@@ -52,7 +52,7 @@ public class ProcedureController {
     }
 
     @PutMapping(value = "/api/procedure-update")
-    public ResponseEntity<?> updateProcedure(@RequestBody ProcedureDto procedureDto, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> updateProcedure(@RequestBody ProcedureDto procedureDto) {
         boolean procedureValidity = procedureService.doesProcedureExists(procedureDto.getName());
         if (!procedureValidity) {
             return ResponseEntity.badRequest().body("Error");
@@ -62,7 +62,7 @@ public class ProcedureController {
     }
 
     @DeleteMapping(value = "/api/procedure-delete/{id}")
-    public ResponseEntity<?> deleteProcedure(@PathVariable Integer id, @AuthenticationPrincipal UserLogin userLogin) {
+    public ResponseEntity<?> deleteProcedure(@PathVariable Integer id) {
         try {
             if (!procedureService.doesProcedureExists(id)) {
                 return ResponseEntity.badRequest().body("Delete procedure fail. Procedure doesn't exists.");
