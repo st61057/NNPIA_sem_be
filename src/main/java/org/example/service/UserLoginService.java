@@ -2,10 +2,11 @@ package org.example.service;
 
 import org.example.dto.ChangeUserLoginPasswordDto;
 import org.example.entity.UserLogin;
-import org.example.repository.LoginRepository;
+import org.example.repository.UserLoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +15,16 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class UserService {
+public class UserLoginService implements UserDetailsService {
 
     @Autowired
-    private LoginRepository loginRepository;
+    private UserLoginRepository userLoginRepository;
 
     public UserLogin findLoginByUsername(String username) {
         if (username == null || username.isEmpty()) {
             throw new RuntimeException("Empty user name input");
         }
-        UserLogin userLogin = loginRepository.findByUsername(username);
+        UserLogin userLogin = userLoginRepository.findByUsername(username);
         if (userLogin == null) {
             throw new NoSuchElementException("User doesn't exist");
         }
@@ -37,13 +38,13 @@ public class UserService {
             userLogin.setUsername(username);
             userLogin.setEmail(email);
             userLogin.setPassword(password);
-            return loginRepository.save(userLogin);
+            return userLoginRepository.save(userLogin);
         }
         throw new Exception("User with this username already exists");
     }
 
     public boolean changePassword(ChangeUserLoginPasswordDto changeUserLoginPasswordDto) {
-        UserLogin userLogin = loginRepository.findByUsername(changeUserLoginPasswordDto.getUsername());
+        UserLogin userLogin = userLoginRepository.findByUsername(changeUserLoginPasswordDto.getUsername());
 
         if (userLogin == null) {
             throw new RuntimeException("Login doesn't exist!");
@@ -58,12 +59,13 @@ public class UserService {
 
     }
 
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserLogin login = loginRepository.findByUsername(username);
+        UserLogin login = userLoginRepository.findByUsername(username);
         if (login == null) {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
-        return new org.springframework.security.core.userdetails.User(login.getUsername(), login.getPassword(), getAuthority());
+        return login;
     }
 
     private List<SimpleGrantedAuthority> getAuthority() {

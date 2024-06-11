@@ -1,18 +1,10 @@
 package org.example.controller;
 
-
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.example.dto.ChangeUserLoginPasswordDto;
-import org.example.dto.CreateProcedureDto;
 import org.example.dto.CreateUserDto;
-import org.example.entity.Procedure;
 import org.example.entity.UserLogin;
-import org.example.enums.ProcedureValidity;
-import org.example.service.UserService;
-import org.modelmapper.ModelMapper;
+import org.example.service.UserLoginService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -20,17 +12,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 public class UserController {
 
-    private UserService userService;
-    private final ModelMapper modelMapper;
+    private UserLoginService userLoginService;
 
-    public UserController(UserService userService, ModelMapper modelMapper) {
-        this.userService = userService;
-        this.modelMapper = modelMapper;
+    public UserController(UserLoginService userLoginService) {
+        this.userLoginService = userLoginService;
     }
 
     @PutMapping
     public ResponseEntity<?> changePassword(@RequestBody ChangeUserLoginPasswordDto changeUserLoginPasswordDto) {
-        if (userService.changePassword(changeUserLoginPasswordDto)) {
+        if (userLoginService.changePassword(changeUserLoginPasswordDto)) {
             return ResponseEntity.ok("Successfully changed password");
         }
         return ResponseEntity.badRequest().body("Somewhere appeared error while changing password");
@@ -39,7 +29,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> addNewUser(@RequestBody CreateUserDto createUserDto) {
         try {
-            UserLogin createdUser = userService.addUser(createUserDto.getUsername(), createUserDto.getEmail(), createUserDto.getPassword());
+            UserLogin createdUser = userLoginService.addUser(createUserDto.getUsername(), createUserDto.getEmail(), createUserDto.getPassword());
             return ResponseEntity.ok(createdUser);
         } catch (Exception exception) {
             return ResponseEntity.status(400).body(exception.getMessage());
