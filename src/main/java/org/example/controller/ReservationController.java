@@ -80,8 +80,8 @@ public class ReservationController {
         }
     }
 
-    @PutMapping("/api/reservation/confirm")
-    public ResponseEntity<?> confirmReservation(@RequestBody Integer resId) {
+    @PutMapping("/api/reservation/confirm/{resId}")
+    public ResponseEntity<?> confirmReservation(@PathVariable Integer resId) {
         try {
             ReservationResponseDto reservation = convertToReservationDto(reservationService.confirmReservation(resId));
             return ResponseEntity.status(200).body(reservation);
@@ -110,13 +110,6 @@ public class ReservationController {
         }
     }
 
-    @GetMapping("/api/reservation/by-email-date-and-status")
-    public ResponseEntity<?> getAllByEmailAndDateAndStatus(String email, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date, ReservationStatus status, Pageable pageable) {
-        Page<Reservation> pagedResult = reservationService.findAllByEmailAndReservationDateAndStatus(email, date, status, pageable);
-        ReservationPagingDto reservationPagingDto = convertToPagingDto(pagedResult);
-        return ResponseEntity.ok(reservationPagingDto);
-    }
-
     @GetMapping("/api/reservation/")
     public ResponseEntity<?> getAllByDateAndStatus(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date, ReservationStatus status, Pageable pageable) {
         Page<Reservation> pagedResult;
@@ -138,6 +131,13 @@ public class ReservationController {
     @GetMapping("/api/reservation/by-status")
     public ResponseEntity<?> getAllByStatus(ReservationStatus status, Pageable pageable) {
         Page<Reservation> pagedResult = reservationService.findAllByStatus(status, pageable);
+        ReservationPagingDto reservationPagingDto = convertToPagingDto(pagedResult);
+        return ResponseEntity.ok(reservationPagingDto);
+    }
+
+    @GetMapping("/api/reservation/by-email-date-and-status")
+    public ResponseEntity<?> getAllByEmailAndDateAndStatus(String email, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date, ReservationStatus status, Pageable pageable) {
+        Page<Reservation> pagedResult = reservationService.findAllByEmailAndReservationDateAndStatus(email, date, status, pageable);
         ReservationPagingDto reservationPagingDto = convertToPagingDto(pagedResult);
         return ResponseEntity.ok(reservationPagingDto);
     }

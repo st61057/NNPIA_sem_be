@@ -1,10 +1,12 @@
 package org.example.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalTime;
 
+@AllArgsConstructor
 @Data
 public class TimeSlotDto {
 
@@ -15,10 +17,4 @@ public class TimeSlotDto {
     private LocalTime endTime;
 
     private boolean isSlotFree;
-
-    public TimeSlotDto(LocalTime startTime, LocalTime endTime, boolean isSlotFree) {
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.isSlotFree = isSlotFree;
-    }
 }
