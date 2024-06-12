@@ -58,6 +58,15 @@ public class ReservationService {
         throw new Exception("This reservation doesn't exist");
     }
 
+    public Reservation deleteReservation(Integer id) throws Exception {
+        Reservation existingReservation = findById(id);
+        if (existingReservation != null) {
+            reservationRepository.delete(existingReservation);
+            return existingReservation;
+        }
+        throw new Exception("This reservation doesn't exist");
+    }
+
     public Reservation confirmReservation(Integer id) {
         Reservation reservation = findById(id);
         reservation.setStatus(ReservationStatus.CONFIRMED);

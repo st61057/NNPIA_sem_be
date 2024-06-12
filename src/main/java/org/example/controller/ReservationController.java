@@ -80,6 +80,16 @@ public class ReservationController {
         }
     }
 
+    @DeleteMapping(value = "/api/reservation/delete/{id}")
+    public ResponseEntity<?> deleteReservation(@PathVariable Integer id) {
+        try {
+            Reservation reservation = reservationService.deleteReservation(id);
+            return ResponseEntity.ok(reservation);
+        } catch (Exception exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        }
+    }
+
     @PutMapping("/api/reservation/confirm/{resId}")
     public ResponseEntity<?> confirmReservation(@PathVariable Integer resId) {
         try {
