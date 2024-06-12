@@ -16,34 +16,32 @@ public class AuthenticationService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserLoginRepository userLoginRepository;
+    private final UserLoginService userLoginService;
 
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationService(JwtService jwtService, PasswordEncoder passwordEncoder, UserLoginRepository userLoginRepository, AuthenticationManager authenticationManager) {
+    public AuthenticationService(JwtService jwtService, PasswordEncoder passwordEncoder, UserLoginService userLoginService, AuthenticationManager authenticationManager) {
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
-        this.userLoginRepository = userLoginRepository;
+        this.userLoginService = userLoginService;
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse addUser(UserLogin request) {
-        UserLogin userLogin = new UserLogin();
-        userLogin.setUsername(request.getUsername());
-        userLogin.setEmail(request.getEmail());
-        userLogin.setPassword(passwordEncoder.encode(request.getPassword()));
+    public AuthenticationResponse addUser(UserLogin request) throws Exception {
+        try {
+            UserLogin userLogin = userLoginService.addUser(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()));
+            String token = jwtService.createToken(userLogin);
 
-        userLogin = userLoginRepository.save(userLogin);
-
-        String token = jwtService.createToken(userLogin);
-
-        return new AuthenticationResponse(token);
+            return new AuthenticationResponse(token);
+        } catch (Exception exception) {
+            throw new Exception(exception.getMessage());
+        }
     }
 
     public AuthenticationResponse authenticate(UserLogin request) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            UserLogin userLogin = userLoginRepository.findByUsername(request.getUsername());
+            UserLogin userLogin = userLoginService.findLoginByUsername(request.getUsername());
             String token = jwtService.createToken(userLogin);
 
             return new AuthenticationResponse(token);

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/user/")
 public class UserController {
 
     private final UserLoginService userLoginService;
@@ -24,16 +24,6 @@ public class UserController {
             return ResponseEntity.ok("Successfully changed password");
         }
         return ResponseEntity.badRequest().body("Somewhere appeared error while changing password");
-    }
-
-    @PostMapping
-    public ResponseEntity<?> addNewUser(@RequestBody CreateUserDto createUserDto) {
-        try {
-            UserLogin createdUser = userLoginService.addUser(createUserDto.getUsername(), createUserDto.getEmail(), createUserDto.getPassword());
-            return ResponseEntity.ok(createdUser);
-        } catch (Exception exception) {
-            return ResponseEntity.status(400).body(exception.getMessage());
-        }
     }
 
 }
