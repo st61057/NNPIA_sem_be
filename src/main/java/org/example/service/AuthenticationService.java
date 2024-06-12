@@ -27,7 +27,7 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse register(UserLogin request) {
+    public AuthenticationResponse addUser(UserLogin request) {
         UserLogin userLogin = new UserLogin();
         userLogin.setUsername(request.getUsername());
         userLogin.setEmail(request.getEmail());
@@ -40,17 +40,16 @@ public class AuthenticationService {
         return new AuthenticationResponse(token);
     }
 
-    public AuthenticationResponse authenticate(UserLogin request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+    public AuthenticationResponse authenticate(UserLogin request) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+            UserLogin userLogin = userLoginRepository.findByUsername(request.getUsername());
+            String token = jwtService.createToken(userLogin);
 
-        UserLogin userLogin = userLoginRepository.findByUsername(request.getUsername());
-        String token = jwtService.createToken(userLogin);
+            return new AuthenticationResponse(token);
+        } catch (Exception exception) {
+            throw new Exception("Invalid authentication");
+        }
 
-        return new AuthenticationResponse(token);
     }
 }

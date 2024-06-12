@@ -27,10 +27,10 @@ public class AuthenticationController {
         this.userLoginService = userLoginService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserLogin userLogin) {
+    @PostMapping("/add")
+    public ResponseEntity<?> addUser(@RequestBody UserLogin userLogin) {
         try {
-            AuthenticationResponse authenticationResponse = authenticationService.register(userLogin);
+            AuthenticationResponse authenticationResponse = authenticationService.addUser(userLogin);
             return ResponseEntity.ok(authenticationResponse);
         } catch (Exception exception) {
             return ResponseEntity.status(400).body(exception.getMessage());
@@ -39,10 +39,14 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLogin userLogin) {
-        authenticationService.authenticate(userLogin);
-        UserLogin login = userLoginService.findLoginByUsername(userLogin.getUsername());
-        String token = jwtService.createToken(login);
-        return ResponseEntity.ok(new AuthToken(token, login.getUsername(), login.getId()));
+        try {
+            authenticationService.authenticate(userLogin);
+            UserLogin login = userLoginService.findLoginByUsername(userLogin.getUsername());
+            String token = jwtService.createToken(login);
+            return ResponseEntity.ok(new AuthToken(token, login.getUsername(), login.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
