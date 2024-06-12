@@ -1,8 +1,6 @@
 package org.example.controller;
 
 import org.example.dto.ChangeUserLoginPasswordDto;
-import org.example.dto.CreateUserDto;
-import org.example.entity.UserLogin;
 import org.example.service.UserLoginService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
