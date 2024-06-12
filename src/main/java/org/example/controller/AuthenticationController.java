@@ -2,6 +2,8 @@ package org.example.controller;
 
 import org.example.config.JwtService;
 import org.example.dto.AuthenticationResponse;
+import org.example.dto.LoginDto;
+import org.example.dto.UserLoginDto;
 import org.example.entity.AuthToken;
 import org.example.entity.UserLogin;
 import org.example.service.AuthenticationService;
@@ -28,7 +30,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addUser(@RequestBody UserLogin userLogin) {
+    public ResponseEntity<?> addUser(@RequestBody UserLoginDto userLogin) {
         try {
             AuthenticationResponse authenticationResponse = authenticationService.addUser(userLogin);
             return ResponseEntity.ok(authenticationResponse);
@@ -38,10 +40,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLogin userLogin) {
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
         try {
-            authenticationService.authenticate(userLogin);
-            UserLogin login = userLoginService.findLoginByUsername(userLogin.getUsername());
+            authenticationService.authenticate(loginDto);
+            UserLogin login = userLoginService.findLoginByUsername(loginDto.getUsername());
             String token = jwtService.createToken(login);
             return ResponseEntity.ok(new AuthToken(token, login.getUsername(), login.getId()));
         } catch (Exception e) {

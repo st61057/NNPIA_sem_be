@@ -85,7 +85,7 @@ public class ProcedureController {
         procedure.setName(createProcedureDto.getName());
         procedure.setPrice(createProcedureDto.getPrice());
         procedure.setDescription(createProcedureDto.getDescription());
-        procedure.setStatus(createProcedureDto.getChecked() ? ProcedureValidity.ACTIVE : ProcedureValidity.INACTIVE);
+        procedure.setStatus(createProcedureDto.getStatus() ? ProcedureValidity.ACTIVE : ProcedureValidity.INACTIVE);
         return procedure;
     }
 

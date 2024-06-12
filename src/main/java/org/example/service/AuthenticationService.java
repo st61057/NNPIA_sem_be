@@ -2,6 +2,8 @@ package org.example.service;
 
 import org.example.config.JwtService;
 import org.example.dto.AuthenticationResponse;
+import org.example.dto.LoginDto;
+import org.example.dto.UserLoginDto;
 import org.example.entity.UserLogin;
 import org.example.repository.UserLoginRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,9 +29,10 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse addUser(UserLogin request) throws Exception {
+    public AuthenticationResponse addUser(UserLoginDto request) throws Exception {
         try {
-            UserLogin userLogin = userLoginService.addUser(request.getUsername(), request.getEmail(), passwordEncoder.encode(request.getPassword()));
+            request.setPassword(passwordEncoder.encode(request.getPassword()));
+            UserLogin userLogin = userLoginService.addUser(request);
             String token = jwtService.createToken(userLogin);
 
             return new AuthenticationResponse(token);
@@ -38,15 +41,18 @@ public class AuthenticationService {
         }
     }
 
-    public AuthenticationResponse authenticate(UserLogin request) throws Exception {
+    public AuthenticationResponse authenticate(LoginDto request) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
             UserLogin userLogin = userLoginService.findLoginByUsername(request.getUsername());
+            if (userLogin == null) {
+                throw new Exception("Non existing use authentication");
+            }
             String token = jwtService.createToken(userLogin);
 
             return new AuthenticationResponse(token);
         } catch (Exception exception) {
-            throw new Exception("Invalid authentication");
+            throw new Exception(exception.getMessage());
         }
 
     }

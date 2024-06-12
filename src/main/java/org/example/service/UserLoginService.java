@@ -1,17 +1,15 @@
 package org.example.service;
 
 import org.example.dto.ChangeUserLoginPasswordDto;
+import org.example.dto.UserLoginDto;
 import org.example.entity.UserLogin;
 import org.example.repository.UserLoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -31,16 +29,25 @@ public class UserLoginService implements UserDetailsService {
         return userLogin;
     }
 
-    public UserLogin addUser(String username, String email, String password) throws Exception {
-        UserLogin existingUserLogin = findLoginByUsername(username);
-        if (existingUserLogin == null) {
-            UserLogin userLogin = new UserLogin();
-            userLogin.setUsername(username);
-            userLogin.setEmail(email);
-            userLogin.setPassword(password);
-            return userLoginRepository.save(userLogin);
+    public boolean doesUserExist(String username) {
+        return userLoginRepository.findByUsername(username) == null;
+    }
+
+    public UserLogin addUser(UserLoginDto userLoginDto) throws Exception {
+        try {
+            boolean existingUserLogin = doesUserExist(userLoginDto.getUsername());
+            if (existingUserLogin) {
+                UserLogin userLogin = new UserLogin();
+                userLogin.setUsername(userLoginDto.getUsername());
+                userLogin.setEmail(userLoginDto.getEmail());
+                userLogin.setPassword(userLoginDto.getPassword());
+                return userLoginRepository.save(userLogin);
+            }else{
+                throw new Exception("User with this name already exists");
+            }
+        } catch (Exception exception) {
+            throw new Exception(exception.getMessage());
         }
-        throw new Exception("User with this username already exists");
     }
 
     public boolean changePassword(ChangeUserLoginPasswordDto changeUserLoginPasswordDto) {
