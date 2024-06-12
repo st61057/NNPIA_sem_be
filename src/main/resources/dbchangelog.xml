@@ -161,14 +161,6 @@
                                  constraintName="fk_reservation_status"/>
     </changeSet>
 
-<!--    <changeSet id="12" author="st61057">-->
-<!--        <addForeignKeyConstraint baseTableName="barbershop"-->
-<!--                                 baseColumnNames="user_id"-->
-<!--                                 referencedTableName="user_login"-->
-<!--                                 referencedColumnNames="id"-->
-<!--                                 constraintName="fk_barbershop_user"/>-->
-<!--    </changeSet>-->
-
     <changeSet id="12" author="st61057">
         <addColumn tableName="reservation">
             <column name="created_time" type="timestamp with time zone"/>
